@@ -1,3 +1,4 @@
+import random
 from flask import Flask, render_template, request
 from datetime import datetime
 
@@ -12,6 +13,7 @@ def index():
     link += "<a href=/welcome?u=福恩&d=靜宜資管&c=資訊管理導論>GET傳值</a><hr>"
     link += "<a href=/account>POST傳值</a><hr>"
     link += "<a href=/math>次方與根號計算</a><hr>"
+    link += "<a href=/cup>擲茭</a><hr>"
     return link
 
 @app.route("/mis")
@@ -74,6 +76,34 @@ def math():
             result = "輸入錯誤"
 
     return render_template("math.html", result=result, x=x, y=y, opt=opt)
+
+@app.route('/cup', methods=["GET"])
+def cup():
+    # 檢查網址是否有 ?action=toss
+    #action = request.args.get('action')
+    action = request.values.get("action")
+    result = None
+    
+    if action == 'toss':
+        # 0 代表陽面，1 代表陰面
+        x1 = random.randint(0, 1)
+        x2 = random.randint(0, 1)
+        
+        # 判斷結果文字
+        if x1 != x2:
+            msg = "聖筊：表示神明允許、同意，或行事會順利。"
+        elif x1 == 0:
+            msg = "笑筊：表示神明一笑、不解，或者考慮中，行事狀況不明。"
+        else:
+            msg = "陰筊：表示神明否定、憤怒，或者不宜行事。"
+            
+        result = {
+            "cup1": "/static/" + str(x1) + ".jpg",
+            "cup2": "/static/" + str(x2) + ".jpg",
+            "message": msg
+        }
+        
+    return render_template('cup.html', result=result)
 
 if __name__ == "__main__":
     app.run(debug=True)
