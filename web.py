@@ -1,6 +1,21 @@
-import random
 from flask import Flask, render_template, request
 from datetime import datetime
+import random
+import os
+import json
+import firebase_admin
+from firebase_admin import credentials, firestore
+
+if os.path.exists('serviceAccountKey.json'):
+    # 本地環境：讀取檔案
+    cred = credentials.Certificate('serviceAccountKey.json')
+else:
+    # 雲端環境：從環境變數讀取 JSON 字串
+    firebase_config = os.getenv('FIREBASE_CONFIG')
+    cred_dict = json.loads(firebase_config)
+    cred = credentials.Certificate(cred_dict)
+
+firebase_admin.initialize_app(cred)
 
 app = Flask(__name__)
 
@@ -14,7 +29,18 @@ def index():
     link += "<a href=/account>POST傳值</a><hr>"
     link += "<a href=/math>次方與根號計算</a><hr>"
     link += "<a href=/cup>擲茭</a><hr>"
+    link += "<a href=/read3>讀取Firestore資料</a><hr>"
     return link
+
+@app.route("/read3")
+def read3():
+    Result = ""
+    db = firestore.client()
+    collection_ref = db.collection("靜宜資管")
+    docs = collection_ref.order_by("lab", direction=firestore.Query.DESCENDING).get()
+    for doc in docs:
+        Result += str(doc.to_dict()) + "<br>"
+    return Result
 
 @app.route("/mis")
 def course():
