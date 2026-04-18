@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>電影查詢</title>
+</head>
+<body>
+
+<h2>電影查詢系統</h2>
+
+<form method="post">
+    請輸入欲查詢的片名：
+    <input type="text" name="MovieTitle">
+    <button type="submit">確定送出</button>
+</form>
+
+<hr>
+
+{% if movies %}
+    {% for m in movies %}
+        <div>
+            <h3>{{ m.title }}</h3>
+
+            <!-- 圖片 -->
+            <img src="{{ m.picture }}" width="150"
+                onerror="this.src='https://via.placeholder.com/150'"><br>
+            <a href="{{ m.hyperlink }}" target="_blank">影片介紹</a><br>
+            片長：{{ m.showLength }} 分鐘<br>
+            上映日期：{{ m.showDate }}<br>
+        </div>
+        <hr>
+    {% endfor %}
+{% endif %}
+
+</body>
+</html>
