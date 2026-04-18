@@ -1,3 +1,4 @@
+from bs4 import BeautifulSoup
 from flask import Flask, render_template, request
 from datetime import datetime
 import random
@@ -5,6 +6,7 @@ import os
 import json
 import firebase_admin
 from firebase_admin import credentials, firestore
+import requests
 
 if os.path.exists('serviceAccountKey.json'):
     # 本地環境：讀取檔案
@@ -30,7 +32,78 @@ def index():
     link += "<a href=/math>次方與根號計算</a><hr>"
     link += "<a href=/cup>擲茭</a><hr>"
     link += "<a href=/read3>讀取Firestore資料</a><hr>"
+    link += "<a href=/search>搜尋老師</a><hr>"
+    link += "<a href=/spider1>爬蟲課程</a><hr>"
     return link
+
+@app.route("/spider1")
+def spider1():
+    from bs4 import BeautifulSoup
+    import requests
+
+    url = "https://www1.pu.edu.tw/~tcyang/course.html"
+
+    headers = {
+        "User-Agent": "Mozilla/5.0"
+    }
+
+    try:
+        Data = requests.get(url, headers=headers, timeout=10, verify=False)
+        Data.encoding = "utf-8"
+    except Exception as e:
+        return f"錯誤: {e}"
+
+    sp = BeautifulSoup(Data.text, "html.parser")
+
+    courses = sp.select(".team-box")
+
+    html = "<h2>課程列表</h2>"
+
+    for c in courses:
+        a_tag = c.find("a")
+        title = c.find("h4")  # 課程名稱
+
+        if a_tag:
+            link = a_tag.get("href")
+
+            # 補完整網址
+            if link and not link.startswith("http"):
+                link = "https://www1.pu.edu.tw/" + link
+
+        else:
+            link = ""
+
+        name = title.text.strip() if title else "無名稱"
+
+        # 👉 這裡就是你要的格式
+        html += f"{link}<br>"
+        html += f"{name}{link}<br>"
+        html += f"{link}<br><br>"
+
+    html += "<a href='/'>回首頁</a>"
+
+    return html
+
+@app.route("/search", methods=["GET", "POST"])
+def search():
+    db = firestore.client()
+    results = []
+    keyword = ""
+    
+    if request.method == "POST":
+        keyword = request.form.get("keyword")
+        collection_ref = db.collection("靜宜資管")
+        docs = collection_ref.get()
+
+        for doc in docs:
+            user = doc.to_dict()
+            if keyword in user["name"]:
+                results.append({
+                    "name": user["name"],
+                    "lab": user["lab"]
+                })
+
+    return render_template("search.html", results=results, keyword=keyword)
 
 @app.route("/read3")
 def read3():
