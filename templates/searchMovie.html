@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>即將上映查詢</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 40px;
+        }
+        .result-item {
+            margin-bottom: 20px;
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+        .highlight {
+            color: blue;
+            font-weight: bold;
+        }
+        img {
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>即將上映查詢</h2>
+
+<form method="POST">
+    <label>請輸入電影片名關鍵字：</label>
+    <input type="text" name="keyword" value="{{ keyword }}">
+    <button type="submit">查詢</button>
+</form>
+
+<hr>
+
+{% if keyword %}
+    <h3>查詢結果（關鍵字：{{ keyword }}）</h3>
+
+    {% if results %}
+        {% for movie in results %}
+            <div class="result-item">
+
+                編號：{{ movie.id }} <br>
+
+                片名：{{ movie.title }} <br>
+
+                <img src="{{ movie.picture }}" width="150"><br>
+
+                介紹頁：
+                <a href="{{ movie.hyperlink }}" target="_blank">
+                    {{ movie.hyperlink }}
+                </a><br>
+
+                上映日期：{{ movie.showDate }}
+
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>找不到資料</p>
+    {% endif %}
+{% endif %}
+
+<br>
+<a href="/">返回首頁</a>
+
+</body>
+</html>
