@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>易肇事路口查詢</title>
+</head>
+<body>
+
+<h2>台中市易肇事路口查詢【作者：黃福恩】</h2>
+
+<form method="post">
+    請輸入路名：
+    <input type="text" name="road" value="{{ keyword }}">
+    <input type="submit" value="查詢">
+</form>
+
+<hr>
+
+{% if results %}
+    {% for r in results %}
+        路口：{{ r.road }}<br>
+        件數：{{ r.count }}<br>
+        死亡：{{ r.death }}<br>
+        受傷：{{ r.injury }}<br>
+        <hr>
+    {% endfor %}
+{% else %}
+    {% if keyword %}
+        查無資料
+    {% endif %}
+{% endif %}
+
+<a href="/">回首頁</a>
+
+</body>
+</html>

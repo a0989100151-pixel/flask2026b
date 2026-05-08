@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>天氣查詢</title>
+</head>
+<body>
+
+<h2>天氣查詢系統【作者：黃福恩】</h2>
+
+<form method="post">
+    請輸入縣市：
+    <input type="text" name="city" value="{{ city }}">
+    <input type="submit" value="查詢">
+</form>
+
+<hr>
+
+{% if result %}
+    <h3>{{ result }}</h3>
+{% endif %}
+
+<a href="/">回首頁</a>
+
+</body>
+</html>
